@@ -2,12 +2,15 @@ package com.example.twitterclient.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.View;
 
 import com.codepath.oauth.OAuthLoginActivity;
 import com.example.twitterclient.R;
+import com.example.twitterclient.application.TwitterClientApp;
+import com.example.twitterclient.models.AccountSettings;
+import com.example.twitterclient.models.User;
 import com.example.twitterclient.restapi.TwitterClient;
+import com.example.twitterclient.restapi.TwitterClient.UserInfoListener;
 
 public class LoginActivity extends OAuthLoginActivity<TwitterClient> {
 
@@ -15,21 +18,42 @@ public class LoginActivity extends OAuthLoginActivity<TwitterClient> {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
-	}
-
-	// Inflate the menu; this adds items to the action bar if it is present.
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.login, menu);
-		return true;
+		AccountSettings.getInstance().setContext(getBaseContext());
 	}
 	
 	// OAuth authenticated successfully, launch primary authenticated activity
 	// i.e Display application "homepage"
     @Override
     public void onLoginSuccess() {
-    	Intent i = new Intent(this, HomeTimelineActivity.class);
+    	User me = AccountSettings.getInstance().getUserInfo();
+    	if (me != null) {
+    		showHomeTimelineActivity();
+    		return;
+    	}
+    	
+    	fetchAccountSettings();
+    }
+    
+    protected void showHomeTimelineActivity() {
+    	Intent i = new Intent(LoginActivity.this, HomeTimelineActivity.class);
     	startActivity(i);
+    }
+    
+    protected void fetchAccountSettings() {
+    	TwitterClientApp.getRestClient().getMyInfo(new UserInfoListener() {
+			
+			@Override
+			public void onSuccess(User user) {
+				AccountSettings.getInstance().saveUserInfo(user);
+				showHomeTimelineActivity();
+			}
+			
+			@Override
+			public void onError(String message) {
+				
+			}
+		});
+    	
     }
     
     // OAuth authentication flow failed, handle the error

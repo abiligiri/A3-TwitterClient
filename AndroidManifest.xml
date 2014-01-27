@@ -47,6 +47,10 @@
             android:name="com.example.twitterclient.activities.HomeTimelineActivity"
             android:label="@string/title_activity_home_timeline" >
         </activity>
+        <activity
+            android:name="com.example.twitterclient.activities.ComposeActivity"
+            android:label="@string/title_activity_compose" >
+        </activity>
     </application>
 
 </manifest>
