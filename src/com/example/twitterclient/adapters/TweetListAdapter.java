@@ -29,7 +29,7 @@ public class TweetListAdapter extends ArrayAdapter<Tweet> {
 		//TextView tvTweetTime = (TextView)convertView.findViewById(R.id.tvTweetTime);
 		TextView tvTweet = (TextView)convertView.findViewById(R.id.tvTweet);
 		ImageView ivProfileImage = (ImageView)convertView.findViewById(R.id.ivProfileImage);
-		
+		ivProfileImage.setImageBitmap(null);
 		Tweet tweet = (Tweet)getItem(position);
 		tvTweet.setText(tweet.getText());
 		//tvTweetTime.setText(tweet.getTimestamp());
