@@ -45,8 +45,9 @@ public class HomeTimelineActivity extends Activity {
 			}
 		});
 		
+		/* For displaying tweets when offline */
+		/* tweetsAdapter.addAll(Tweet.getMostRecentTweets()); */
 		getTweets(0);
-		
 	}
 	
 	protected void setupViews() {
