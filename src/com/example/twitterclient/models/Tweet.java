@@ -3,6 +3,7 @@ package com.example.twitterclient.models;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import org.json.JSONArray;
@@ -19,7 +20,7 @@ import com.activeandroid.query.Select;
 public class Tweet extends Model {
 	private static final String DATE_FORMAT = "EEE MMM dd HH:mm:ss Z yyyy";
 
-	@Column(name = "tweetId")
+	@Column(name = "tweetId", unique=true, onUniqueConflict = Column.ConflictAction.REPLACE)
 	private long id;
 	
 	@Column(name = "user")
@@ -104,4 +105,12 @@ public class Tweet extends Model {
 		return getText();
 	}
 
+	public static ArrayList<Tweet> getMostRecentTweets() {
+		List<Tweet> t =  new Select().distinct().from(Tweet.class).orderBy("tweetId DESC").limit(25).execute();
+		
+		if (t == null)
+			return null;
+		
+		return new ArrayList<Tweet>(t);
+	}
 }

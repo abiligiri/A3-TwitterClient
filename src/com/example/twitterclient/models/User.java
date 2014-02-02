@@ -15,7 +15,7 @@ import com.activeandroid.query.Select;
 @Table(name = "users")
 public class User extends Model {
 	
-	@Column(name = "idStr")
+	@Column(name = "idStr", unique=true, onUniqueConflict = Column.ConflictAction.REPLACE)
 	private String idStr;
 
 	@Column(name = "profileImageUrl")
