@@ -20,7 +20,7 @@ import com.activeandroid.query.Select;
 public class Tweet extends Model {
 	private static final String DATE_FORMAT = "EEE MMM dd HH:mm:ss Z yyyy";
 
-	@Column(name = "tweetId", unique=true, onUniqueConflict = Column.ConflictAction.REPLACE)
+	@Column(name = "tweetId")
 	private long id;
 	
 	@Column(name = "user")

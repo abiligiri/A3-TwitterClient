@@ -9,16 +9,16 @@ import com.example.twitterclient.application.TwitterClientApp;
 import com.example.twitterclient.models.Tweet;
 import com.example.twitterclient.restapi.TwitterClient.TweetsListener;
 
+public class MentionsTimelineFragment extends TweetsListFragment {
 
-public class HomeTimelineFragment extends TweetsListFragment {
-	
-	protected void getTweets(long tweetId) {
-		Log.d("HomeTimelineFragment", "loading from tweetID " + String.valueOf(tweetId));
-		TwitterClientApp.getRestClient().getHomeTimeline(tweetId, new TweetsListener() {
+	@Override
+	protected void getTweets(long tweetID) {
+		Log.d("MentionsTimelineFragment", "loading from tweetID " + String.valueOf(tweetID));
+		TwitterClientApp.getRestClient().getMentionsTimeline(tweetID, new TweetsListener() {
 			
 			@Override
 			public void onError(String message) {
-				Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+				Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();	
 			}
 			
 			@Override
@@ -27,4 +27,5 @@ public class HomeTimelineFragment extends TweetsListFragment {
 			}
 		});
 	}
+
 }

@@ -35,7 +35,7 @@ public class LoginActivity extends OAuthLoginActivity<TwitterClient> {
     }
     
     protected void showHomeTimelineActivity() {
-    	Intent i = new Intent(LoginActivity.this, HomeTimelineActivity.class);
+    	Intent i = new Intent(LoginActivity.this, TimelineActivity.class);
     	startActivity(i);
     }
     

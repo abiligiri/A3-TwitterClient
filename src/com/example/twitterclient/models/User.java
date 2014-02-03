@@ -17,9 +17,6 @@ import com.activeandroid.query.Select;
 @Table(name = "users")
 public class User extends Model {
 	
-	@Column(name = "userId", unique=true, onUniqueConflict = Column.ConflictAction.REPLACE)
-	private long id;
-	
 	@Column(name = "idStr")
 	private String idStr;
 
@@ -50,7 +47,6 @@ public class User extends Model {
 		
 		try {
 			this.idStr = object.getString("id_str");
-			this.id = Long.parseLong(this.idStr);
 			this.name = object.getString("name");
 			this.screenName = object.getString("screen_name");
 			this.profileImageUrl = object.getString("profile_image_url");

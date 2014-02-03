@@ -1,9 +1,12 @@
 package com.example.twitterclient.activities;
 
+import android.app.ActionBar;
+import android.app.ActionBar.Tab;
+import android.app.ActionBar.TabListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,13 +14,12 @@ import android.view.MenuItem;
 import com.example.twitterclient.R;
 import com.example.twitterclient.application.TwitterClientApp;
 import com.example.twitterclient.fragments.HomeTimelineFragment;
+import com.example.twitterclient.fragments.MentionsTimelineFragment;
 import com.example.twitterclient.models.AccountSettings;
 import com.example.twitterclient.models.Tweet;
 import com.example.twitterclient.restapi.TwitterClient.PostTweetListener;
 
-public class HomeTimelineActivity extends FragmentActivity {
-	//private static final String TAG = "HomeTimelineActivity";
-
+public class TimelineActivity extends FragmentActivity implements TabListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -25,14 +27,23 @@ public class HomeTimelineActivity extends FragmentActivity {
 		
 		setTitle(AccountSettings.getInstance().getUserInfo().getFormattedScreenname());
 		
-		FragmentTransaction transaction =  getSupportFragmentManager().beginTransaction();
-		transaction.replace(R.id.fragmentFrame, new HomeTimelineFragment());
-		transaction.commit();
+		setupNavigationTabs();
+	}
+	
+	private void setupNavigationTabs() {
+		ActionBar actionBar = getActionBar();
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		actionBar.setDisplayShowTitleEnabled(true);
 		
+		Tab tabHome = actionBar.newTab().setTag("HomeTimelineFragment").setText("Home").setTabListener(this).setIcon(R.drawable.ic_launcher);
+		Tab tabMentions = actionBar.newTab().setTag("MentionsTimelineFragment").setText("Mentions").setTabListener(this).setIcon(R.drawable.ic_launcher);
+		actionBar.addTab(tabHome);
+		actionBar.addTab(tabMentions);
+		actionBar.selectTab(tabHome);
 	}
 
-	
-	
+
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -89,6 +100,37 @@ public class HomeTimelineActivity extends FragmentActivity {
 				
 			}
 		});
+	}
+
+
+
+	@Override
+	public void onTabReselected(Tab tab, android.app.FragmentTransaction transaction) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void onTabSelected(Tab tab, android.app.FragmentTransaction transaction) {
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		
+		if (tab.getTag() == "HomeTimelineFragment") {
+			ft.replace(R.id.fragmentFrame, new HomeTimelineFragment());
+		} else {
+			ft.replace(R.id.fragmentFrame, new MentionsTimelineFragment());
+		}
+		
+		ft.commit();
+	}
+
+
+
+	@Override
+	public void onTabUnselected(Tab tab, android.app.FragmentTransaction transactions) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	

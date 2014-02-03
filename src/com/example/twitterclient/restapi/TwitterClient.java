@@ -8,9 +8,9 @@ import org.scribe.builder.api.Api;
 import org.scribe.builder.api.TwitterApi;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.codepath.oauth.OAuthBaseClient;
-import com.example.twitterclient.models.AccountSettings;
 import com.example.twitterclient.models.Tweet;
 import com.example.twitterclient.models.User;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -22,6 +22,7 @@ public class TwitterClient extends OAuthBaseClient {
     public static final String REST_CONSUMER_KEY = "xvg1mfWQUMU60n4SxHiBg";       // Change this
     public static final String REST_CONSUMER_SECRET = "zIaT9AhwG1gc753fYqx3NX6ehBJ1Lqf2pWNDnrETBto"; // Change this
     public static final String REST_CALLBACK_URL = "oauth://twitterintro"; // Change this (here and in manifest)
+    private static final String TAG = "TwitterClient";
     
     public TwitterClient(Context context) {
         super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
@@ -34,7 +35,37 @@ public class TwitterClient extends OAuthBaseClient {
     }
     
     public void getHomeTimeline(long tweetId, final TweetsListener listener) {
+    	Log.d(TAG, "Fetching home timeline");
     	String url = getApiUrl("statuses/home_timeline.json");
+    	RequestParams params = new RequestParams();
+    	if (tweetId > 0) {
+    		params.put("max_id", String.valueOf(tweetId));
+    	}
+    	
+    	params.put("count", "25");
+    	client.get(url, new JsonHttpResponseHandler() {
+    		@Override
+    		public void onSuccess(JSONArray jsonTweets) {
+    			listener.onSuccess(Tweet.fromJsonArray(jsonTweets));
+    		}
+    		
+    		@Override
+    		public void onFailure(Throwable t) {
+    			listener.onError(t.getMessage());
+    		}
+    		
+    		@Override
+    		protected void handleFailureMessage(Throwable arg0, String arg1) {
+    			Log.d(TAG, "Response" + arg1);
+    			super.handleFailureMessage(arg0, arg1);
+    			
+    		}
+    	});
+    }
+    
+    public void getMentionsTimeline(long tweetId, final TweetsListener listener) {
+    	Log.d(TAG, "Fetching mentions timeline");
+    	String url = getApiUrl("statuses/mentions_timeline.json");
     	RequestParams params = new RequestParams();
     	if (tweetId > 0) {
     		params.put("max_id", String.valueOf(tweetId));
@@ -53,7 +84,6 @@ public class TwitterClient extends OAuthBaseClient {
     		}
     	});
     }
-    
     public static interface UserInfoListener {
     	public void onError(String message);
     	public void onSuccess(User user);

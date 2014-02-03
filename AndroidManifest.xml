@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="10"
+        android:minSdkVersion="11"
         android:targetSdkVersion="18" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -44,7 +44,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.twitterclient.activities.HomeTimelineActivity"
+            android:name="com.example.twitterclient.activities.TimelineActivity"
             android:label="@string/title_activity_home_timeline" >
         </activity>
         <activity

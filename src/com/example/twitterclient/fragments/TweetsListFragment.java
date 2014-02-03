@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,35 +19,36 @@ import com.example.twitterclient.models.Tweet;
 
 public abstract class TweetsListFragment extends Fragment {
 	protected ListView lvTweets;
+	protected ArrayList<Tweet> tweetList;
 	protected ArrayAdapter<Tweet> tweetsAdapter;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_tweets_list, container, false);
-		lvTweets = (ListView) view.findViewById(R.id.lvTweets);
-		
-		return view;
+		return inflater.inflate(R.layout.fragment_tweets_list, container, false);
 	}
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		tweetsAdapter = new TweetListAdapter(getActivity(), new ArrayList<Tweet>());
+		tweetList = new ArrayList<Tweet>();
+		tweetsAdapter = new TweetListAdapter(getActivity(), tweetList);
+		lvTweets = (ListView) getActivity().findViewById(R.id.lvTweets);
 		lvTweets.setAdapter(tweetsAdapter);
 		
 		lvTweets.setOnScrollListener(new EndlessScrollListener() {
 				
 				@Override
 				public void onLoadMore(int page, int totalItemsCount) {
+					Log.d("TweetsListFragment", "Total Items " + String.valueOf(totalItemsCount));
 					if (totalItemsCount > 0) {
 						getTweets(tweetsAdapter.getItem(totalItemsCount - 1).getUniqueId());
 						return;
 					}
+					
+					getTweets(0);
 				}
 			});
-		
-		getTweets(0);
 	}
 	
 	protected ArrayAdapter<Tweet> getAdapter() {
