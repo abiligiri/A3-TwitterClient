@@ -37,42 +37,43 @@ public class TwitterClient extends OAuthBaseClient {
     public void getHomeTimeline(long tweetId, final TweetsListener listener) {
     	Log.d(TAG, "Fetching home timeline");
     	String url = getApiUrl("statuses/home_timeline.json");
-    	RequestParams params = new RequestParams();
-    	if (tweetId > 0) {
-    		params.put("max_id", String.valueOf(tweetId));
-    	}
-    	
-    	params.put("count", "25");
-    	client.get(url, new JsonHttpResponseHandler() {
-    		@Override
-    		public void onSuccess(JSONArray jsonTweets) {
-    			listener.onSuccess(Tweet.fromJsonArray(jsonTweets));
-    		}
-    		
-    		@Override
-    		public void onFailure(Throwable t) {
-    			listener.onError(t.getMessage());
-    		}
-    		
-    		@Override
-    		protected void handleFailureMessage(Throwable arg0, String arg1) {
-    			Log.d(TAG, "Response" + arg1);
-    			super.handleFailureMessage(arg0, arg1);
-    			
-    		}
-    	});
+    	getTweets(url, tweetId, listener);
     }
+    
     
     public void getMentionsTimeline(long tweetId, final TweetsListener listener) {
     	Log.d(TAG, "Fetching mentions timeline");
     	String url = getApiUrl("statuses/mentions_timeline.json");
+    	getTweets(url, tweetId, listener);
+    
+    }
+    
+    public void getUserTimeline(long tweedId, String userId, final TweetsListener listener) {
+    	Log.d(TAG, "Fetching mentions timeline");
+    	String url = getApiUrl("statuses/user_timeline.json");
+    	RequestParams params = new RequestParams();
+    	if (tweedId > 0) {
+    		params.put("max_id", String.valueOf(tweedId));
+    	}
+    	
+    	params.put("user_id", userId);
+    	params.put("count", "25");
+    	getTweets(url, params, listener);
+    }
+    
+    protected void getTweets(String url, long tweetId, final TweetsListener listener) {
     	RequestParams params = new RequestParams();
     	if (tweetId > 0) {
     		params.put("max_id", String.valueOf(tweetId));
     	}
     	
     	params.put("count", "25");
-    	client.get(url, new JsonHttpResponseHandler() {
+    	getTweets(url, params, listener);
+    }
+    
+    private void getTweets(String url, RequestParams params,
+			final TweetsListener listener) {
+    	client.get(url, params, new JsonHttpResponseHandler() {
     		@Override
     		public void onSuccess(JSONArray jsonTweets) {
     			listener.onSuccess(Tweet.fromJsonArray(jsonTweets));
@@ -82,9 +83,11 @@ public class TwitterClient extends OAuthBaseClient {
     		public void onFailure(Throwable t) {
     			listener.onError(t.getMessage());
     		}
-    	});
-    }
-    public static interface UserInfoListener {
+    	});	
+	}
+
+
+	public static interface UserInfoListener {
     	public void onError(String message);
     	public void onSuccess(User user);
     }

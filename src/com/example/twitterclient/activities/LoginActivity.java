@@ -27,14 +27,14 @@ public class LoginActivity extends OAuthLoginActivity<TwitterClient> {
     public void onLoginSuccess() {
     	User me = AccountSettings.getInstance().getUserInfo();
     	if (me != null) {
-    		showHomeTimelineActivity();
+    		showTimelineActivity();
     		return;
     	}
     	
     	fetchAccountSettings();
     }
     
-    protected void showHomeTimelineActivity() {
+    protected void showTimelineActivity() {
     	Intent i = new Intent(LoginActivity.this, TimelineActivity.class);
     	startActivity(i);
     }
@@ -45,7 +45,7 @@ public class LoginActivity extends OAuthLoginActivity<TwitterClient> {
 			@Override
 			public void onSuccess(User user) {
 				AccountSettings.getInstance().saveUserInfo(user);
-				showHomeTimelineActivity();
+				showTimelineActivity();
 			}
 			
 			@Override

@@ -2,6 +2,7 @@ package com.example.twitterclient.fragments;
 
 import java.util.ArrayList;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -15,26 +16,51 @@ import android.widget.ListView;
 
 import com.example.twitterclient.R;
 import com.example.twitterclient.adapters.TweetListAdapter;
+import com.example.twitterclient.adapters.TweetListAdapter.OnImageTapListener;
 import com.example.twitterclient.models.Tweet;
+import com.example.twitterclient.models.User;
 
-public abstract class TweetsListFragment extends Fragment {
+public abstract class TweetsListFragment extends Fragment implements OnImageTapListener {
 	protected ListView lvTweets;
-	protected ArrayList<Tweet> tweetList;
-	protected ArrayAdapter<Tweet> tweetsAdapter;
+	protected TweetListAdapter tweetsAdapter;
+	
+	public static interface ProfileDisplayListener {
+		public void displayProfile(User user);
+	}
+	
+	private ProfileDisplayListener profileDisplayListener;
+	
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		
+		if (activity instanceof ProfileDisplayListener) {
+			profileDisplayListener = (ProfileDisplayListener) activity;
+		}
+	}
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		tweetsAdapter = new TweetListAdapter(getActivity(), new ArrayList<Tweet>());
+		tweetsAdapter.setImageTapListener(this);
+	}
+	
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.fragment_tweets_list, container, false);
+		View contentview = inflater.inflate(R.layout.fragment_tweets_list, container, false);
+		lvTweets = (ListView) contentview.findViewById(R.id.lvTweets);
+		lvTweets.setAdapter(getAdapter());
+		return contentview;
 	}
+	
+	
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		tweetList = new ArrayList<Tweet>();
-		tweetsAdapter = new TweetListAdapter(getActivity(), tweetList);
-		lvTweets = (ListView) getActivity().findViewById(R.id.lvTweets);
-		lvTweets.setAdapter(tweetsAdapter);
 		
 		lvTweets.setOnScrollListener(new EndlessScrollListener() {
 				
@@ -46,13 +72,27 @@ public abstract class TweetsListFragment extends Fragment {
 						return;
 					}
 					
-					getTweets(0);
 				}
 			});
+		
+		//Required for initial load
+		getTweets(0);
+	}
+	
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		profileDisplayListener = null;
 	}
 	
 	protected ArrayAdapter<Tweet> getAdapter() {
 		return tweetsAdapter;
+	}
+	
+	@Override
+	public void tweetForTappedImage(Tweet t) {
+		if (profileDisplayListener != null)
+			profileDisplayListener.displayProfile(t.getUser());
 	}
 	
 	protected abstract void getTweets(long tweetID);

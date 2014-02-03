@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import com.example.twitterclient.application.TwitterClientApp;
 import com.example.twitterclient.models.Tweet;
+import com.example.twitterclient.models.User;
 import com.example.twitterclient.restapi.TwitterClient.TweetsListener;
 
 
@@ -26,5 +27,9 @@ public class HomeTimelineFragment extends TweetsListFragment {
 				getAdapter().addAll(tweets);
 			}
 		});
+	}
+	
+	public void onTweetPosted (Tweet t) {
+		getAdapter().insert(t, 0);
 	}
 }

@@ -5,7 +5,6 @@ import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
@@ -15,18 +14,25 @@ import com.example.twitterclient.R;
 import com.example.twitterclient.application.TwitterClientApp;
 import com.example.twitterclient.fragments.HomeTimelineFragment;
 import com.example.twitterclient.fragments.MentionsTimelineFragment;
+import com.example.twitterclient.fragments.TweetsListFragment.ProfileDisplayListener;
 import com.example.twitterclient.models.AccountSettings;
 import com.example.twitterclient.models.Tweet;
+import com.example.twitterclient.models.User;
 import com.example.twitterclient.restapi.TwitterClient.PostTweetListener;
 
-public class TimelineActivity extends FragmentActivity implements TabListener {
+public class TimelineActivity extends FragmentActivity implements TabListener, ProfileDisplayListener {
+	private HomeTimelineFragment fragmentHomeTimeline;
+	private MentionsTimelineFragment fragmentMentionsTimeline;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_fragment);
 		
-		setTitle(AccountSettings.getInstance().getUserInfo().getFormattedScreenname());
+		setTitle(AccountSettings.getInstance().getUserInfo().getName());
 		
+		fragmentHomeTimeline = new HomeTimelineFragment();
+		fragmentMentionsTimeline = new MentionsTimelineFragment();
 		setupNavigationTabs();
 	}
 	
@@ -35,8 +41,8 @@ public class TimelineActivity extends FragmentActivity implements TabListener {
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		actionBar.setDisplayShowTitleEnabled(true);
 		
-		Tab tabHome = actionBar.newTab().setTag("HomeTimelineFragment").setText("Home").setTabListener(this).setIcon(R.drawable.ic_launcher);
-		Tab tabMentions = actionBar.newTab().setTag("MentionsTimelineFragment").setText("Mentions").setTabListener(this).setIcon(R.drawable.ic_launcher);
+		Tab tabHome = actionBar.newTab().setTag("HomeTimelineFragment").setText("Home").setTabListener(this);
+		Tab tabMentions = actionBar.newTab().setTag("MentionsTimelineFragment").setText("Mentions").setTabListener(this);
 		actionBar.addTab(tabHome);
 		actionBar.addTab(tabMentions);
 		actionBar.selectTab(tabHome);
@@ -47,7 +53,7 @@ public class TimelineActivity extends FragmentActivity implements TabListener {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.home_timeline, menu);
+		getMenuInflater().inflate(R.menu.timeline, menu);
 		return true;
 	}
 
@@ -56,20 +62,31 @@ public class TimelineActivity extends FragmentActivity implements TabListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
 		case R.id.action_compose:
-			Intent i = new Intent(this, ComposeActivity.class);
-			startActivityForResult(i, REQUEST_CODE_TWEET);
+			showComposeActivity();
+			break;
+		
+		case R.id.action_profile:
+			showProfileActivityForUserId(AccountSettings.getInstance().getUserInfo().getIdStr());
 			break;
 			
-		case R.id.action_refresh:
-//			tweetsAdapter.clear();
-//			getTweets(0);
-			default:
+		default:
 				break;
 		}
 		
 		return true;
 	}
 	
+	private void showProfileActivityForUserId(String userId) {
+		Intent i = new Intent(this, ProfileActivity.class);
+		i.putExtra("userId", userId);
+		startActivity(i);
+	}
+
+	private void showComposeActivity() {
+		Intent i = new Intent(this, ComposeActivity.class);
+		startActivityForResult(i, REQUEST_CODE_TWEET);
+	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_CODE_TWEET) {
@@ -92,7 +109,7 @@ public class TimelineActivity extends FragmentActivity implements TabListener {
 			
 			@Override
 			public void onSuccess(Tweet tweet) {
-				//tweetsAdapter.insert(tweet, 0);
+				fragmentHomeTimeline.onTweetPosted(tweet);
 			}
 			
 			@Override
@@ -117,9 +134,9 @@ public class TimelineActivity extends FragmentActivity implements TabListener {
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		
 		if (tab.getTag() == "HomeTimelineFragment") {
-			ft.replace(R.id.fragmentFrame, new HomeTimelineFragment());
+			ft.replace(R.id.fragmentFrame, fragmentHomeTimeline);
 		} else {
-			ft.replace(R.id.fragmentFrame, new MentionsTimelineFragment());
+			ft.replace(R.id.fragmentFrame, fragmentMentionsTimeline);
 		}
 		
 		ft.commit();
@@ -132,6 +149,10 @@ public class TimelineActivity extends FragmentActivity implements TabListener {
 		// TODO Auto-generated method stub
 		
 	}
-	
+
+	@Override
+	public void displayProfile(User user) {
+		showProfileActivityForUserId(user.getIdStr());
+	}	
 	
 }
