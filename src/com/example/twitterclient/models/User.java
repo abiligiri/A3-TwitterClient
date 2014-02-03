@@ -5,6 +5,8 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
@@ -15,7 +17,10 @@ import com.activeandroid.query.Select;
 @Table(name = "users")
 public class User extends Model {
 	
-	@Column(name = "idStr", unique=true, onUniqueConflict = Column.ConflictAction.REPLACE)
+	@Column(name = "userId", unique=true, onUniqueConflict = Column.ConflictAction.REPLACE)
+	private long id;
+	
+	@Column(name = "idStr")
 	private String idStr;
 
 	@Column(name = "profileImageUrl")
@@ -45,6 +50,7 @@ public class User extends Model {
 		
 		try {
 			this.idStr = object.getString("id_str");
+			this.id = Long.parseLong(this.idStr);
 			this.name = object.getString("name");
 			this.screenName = object.getString("screen_name");
 			this.profileImageUrl = object.getString("profile_image_url");

@@ -47,6 +47,8 @@ public class Tweet extends Model {
 			this.timestamp = object.getString("created_at");
 		} catch (JSONException e) {
 			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
